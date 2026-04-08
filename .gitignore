@@ -9,6 +9,13 @@ backend/internal/web/dist/*
 !backend/internal/web/dist/
 !backend/internal/web/dist/.keep
 
+# melange/apko build artifacts
+/melange.rsa
+/melange.rsa.pub
+/packages/
+/fusion.tar
+sbom-*.json
+
 # The .env file may contain secrets, so exclude it from source control.
 .env*
 # .env.example is an exception as it only contains dummy secrets.

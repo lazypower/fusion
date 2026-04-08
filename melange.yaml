@@ -1,0 +1,55 @@
+package:
+  name: fusion
+  version: 0.0.1
+  epoch: 0
+  description: Fusion - a lightweight RSS feed reader
+  copyright:
+    - license: MIT
+
+environment:
+  contents:
+    repositories:
+      - https://packages.wolfi.dev/os
+    keyring:
+      - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
+    packages:
+      - busybox
+      - ca-certificates-bundle
+      - git
+      - go-1.26
+      - nodejs-22
+      - pnpm
+
+pipeline:
+  # Build the frontend assets with pnpm/vite
+  - name: Build frontend
+    runs: |
+      set -ex
+      cd frontend
+      pnpm install --frozen-lockfile
+      VITE_FUSION_VERSION="${{package.version}}" pnpm run build
+
+  # Copy built frontend into the Go embed location
+  - name: Stage frontend assets for Go embed
+    runs: |
+      set -ex
+      rm -rf backend/internal/web/dist
+      mkdir -p backend/internal/web/dist
+      cp -r frontend/dist/. backend/internal/web/dist/
+      printf '%s\n' "embedded" > backend/internal/web/dist/.keep
+
+  # Build the static Go binary
+  - name: Build Go binary
+    runs: |
+      set -ex
+      cd backend
+      CGO_ENABLED=0 go build \
+        -trimpath \
+        -ldflags="-s -w" \
+        -o "${{targets.destdir}}/usr/bin/fusion" \
+        ./cmd/fusion
+
+  # Create the data directory in the package
+  - name: Create data directory
+    runs: |
+      mkdir -p "${{targets.destdir}}/data"

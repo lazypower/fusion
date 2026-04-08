@@ -1,0 +1,46 @@
+name: image
+
+on:
+  push:
+    branches:
+      - wolfi-main
+    paths:
+      - backend/**
+      - frontend/**
+      - melange.yaml
+      - apko.yaml
+      - .github/workflows/image.yml
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Build package
+        uses: chainguard-dev/actions/melange-build@main
+        with:
+          config: melange.yaml
+          archs: x86_64
+          sign-with-temporary-key: true
+
+      - name: Publish image
+        uses: chainguard-images/actions/apko-publish@main
+        with:
+          config: apko.yaml
+          tag: ghcr.io/${{ github.repository }}:latest
+          keyring-append: ${{ github.workspace }}/melange.rsa.pub
+          generic-user: ${{ github.actor }}
+          generic-pass: ${{ github.token }}
