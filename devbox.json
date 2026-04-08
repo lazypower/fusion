@@ -1,0 +1,17 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.16.0/.schema/devbox.schema.json",
+  "packages": [
+    "go@1.26",
+    "nodejs@22",
+    "pnpm@latest"
+  ],
+  "env": {
+    "GOPATH": "$PWD/.go"
+  },
+  "shell": {
+    "scripts": {
+      "test-backend": "./scripts.sh test-backend",
+      "build": "./scripts.sh build"
+    }
+  }
+}

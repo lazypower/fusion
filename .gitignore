@@ -1,4 +1,6 @@
 .DS_*
+.devbox/
+.go/
 *.db
 *.db-*
 .claude

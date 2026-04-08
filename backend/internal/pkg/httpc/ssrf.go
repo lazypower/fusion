@@ -49,7 +49,7 @@ func validatePublicHost(ctx context.Context, host string) error {
 		resolveCtx = context.Background()
 	}
 
-	lookupCtx, cancel := context.WithTimeout(resolveCtx, 2*time.Second)
+	lookupCtx, cancel := context.WithTimeout(resolveCtx, 10*time.Second)
 	defer cancel()
 
 	addrs, err := net.DefaultResolver.LookupIPAddr(lookupCtx, host)

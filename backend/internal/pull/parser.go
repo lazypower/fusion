@@ -42,10 +42,7 @@ type FetchResult struct {
 func FetchAndParse(ctx context.Context, feed *model.Feed, timeout time.Duration, allowPrivateFeeds bool) (*FetchResult, error) {
 	result := &FetchResult{}
 
-	if err := httpc.ValidateRequestURL(ctx, feed.Link, allowPrivateFeeds); err != nil {
-		return nil, fmt.Errorf("validate feed url: %w", err)
-	}
-
+	// SSRF validation happens in the client's DialContext, no need to double-resolve here.
 	client, err := httpc.NewClient(timeout, feed.Proxy, allowPrivateFeeds)
 	if err != nil {
 		return nil, fmt.Errorf("create client: %w", err)
